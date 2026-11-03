@@ -1,0 +1,960 @@
+//SPDX-License-Identifier: UNLICENSED
+
+pragma solidity ^0.8.0;
+
+contract Bank {
+
+   uint256 balance=0;
+   address public accOwner;
+
+   constructor(){
+       accOwner=msg.sender;
+   }
+
+    function deposit() public payable {
+
+        require(accOwner==msg.sender,"You are not an account owner");
+        require(msg.value > 0,"Amount should be greater than zero!");
+
+        balance+=msg.value;
+    }
+
+    function withdraw() public payable{
+
+        require(accOwner==msg.sender,"You are not an account owner");
+        require(msg.value>0,"Withdrawal money should be greater than zero");
+
+        balance-=msg.value;
+    }
+
+    function showBalance()public view returns(uint256){
+        require(accOwner==msg.sender,"You are not an account owner");
+        return balance;
+    }
+}
+
+
+
+####explaination###
+'''
+1. What are we creating?
+We are creating a Bank Smart Contract using Solidity.
+
+Think of it as a simple digital bank that works on the Ethereum blockchain.
+
+Our smart contract allows an account owner to:
+1. Deposit money into the bank.
+2. Withdraw money from the bank.
+3. Check the available balance.
+4. Prevent anyone other than the account owner from performing these operations.
+
+
+3. Explanation block by block
+Block 1: SPDX License Identifier
+//SPDX-License-Identifier: UNLICENSED
+
+
+What is SPDX?
+
+SPDX stands for Software Package Data Exchange.
+
+It is a standard used to identify the license under which software is distributed.
+
+Here:
+- // indicates a comment.
+- SPDX-License-Identifier specifies the license.
+- UNLICENSED means the code does not declare an open-source license.
+Why do we use it?
+
+Solidity recommends specifying a license identifier so that the compiler knows the licensing information of the source code.
+
+This line does not affect the execution of the smart contract.
+Block 2: Solidity Version
+pragma solidity ^0.8.0;
+
+
+Let's understand each part.
+- pragma: Provides compiler instructions.
+- solidity: Specifies the programming language.
+- ^0.8.0: Specifies the compatible compiler version range.
+The ^ symbol means the code is compatible with Solidity versions from 0.8.0 up to, but not including, 0.9.0.
+
+Why do we use it?
+
+Different Solidity versions may have different features and syntax.
+
+This line ensures that we compile the contract using a compatible version.
+Block 3: Contract Declaration
+contract Bank {
+
+
+What is a contract?
+
+A contract in Solidity is similar to a class in languages like Java or Python.
+
+It contains:
+- Variables
+- Functions
+- Constructor
+- Business logic
+Here, we are creating a contract named Bank.
+
+Everything written inside these curly brackets { } belongs to the Bank contract.
+
+Why do we use it?
+
+We need a contract to define the rules and operations of our blockchain-based banking system.
+Block 4: Declaring Variables
+uint256 balance = 0;
+address public accOwner;
+
+
+We have declared two variables.
+
+First variable:
+uint256 balance = 0;
+
+
+Let's break it down:
+Keyword	Meaning
+uint256	Unsigned integer of 256 bits
+balance	Variable name
+= 0	Initial value is zero
+
+What is uint256?
+- uint means unsigned integer.
+- Unsigned means it cannot store negative numbers.
+- 256 means it uses 256 bits of storage.
+We use it to store the account balance.
+
+For example:
+
+Initially:
+balance = 0;
+
+
+After depositing 5 ETH:
+balance = 5 ETH;
+
+
+Technically, Solidity stores Ether values in Wei, not as decimal ETH.
+
+1 ETH = 10¹⁸ Wei.
+
+Why do we use uint256?
+
+Because the account balance represents money, which cannot be negative.
+
+Second variable:
+address public accOwner;
+
+
+Let's understand:
+- address: A Solidity data type used to store an Ethereum wallet address.
+- public: Makes the variable publicly readable.
+- accOwner: Name of the variable.
+An Ethereum address looks something like:
+0x1234567890123456789012345678901234567890
+
+
+We use this variable to store the wallet address of the account owner.
+
+Why do we use public?
+
+Because we want the account owner's address to be accessible from outside the contract.
+
+For example, Remix automatically provides a getter function for public state variables.
+
+We can click accOwner and see the stored address.
+Block 5: Constructor
+constructor(){
+    accOwner = msg.sender;
+}
+
+
+This is one of the most important blocks.
+
+What is a constructor?
+
+A constructor is a special function that executes automatically when we deploy the smart contract.
+
+It executes only once during contract creation.
+
+Let's understand the statement:
+accOwner = msg.sender;
+
+
+What is msg.sender?
+
+msg.sender is a special global variable in Solidity.
+
+It represents the address of the account that is currently calling the function.
+
+When we deploy this contract, the person deploying it becomes the owner.
+
+For example:
+
+Suppose your wallet address is:
+0xABC123...
+
+
+When you deploy the contract:
+accOwner = msg.sender;
+
+
+The contract stores:
+accOwner = 0xABC123...
+
+
+Now this address becomes the account owner.
+
+Why do we use a constructor?
+
+We use it to automatically assign ownership during deployment rather than manually entering the owner's address.
+
+Remember:
+- Constructor runs once.
+- msg.sender identifies the deployer's address during deployment.
+- That address is stored in accOwner.
+Block 6: Deposit Function
+function deposit() public payable {
+
+    require(accOwner == msg.sender, "You are not an account owner");
+    require(msg.value > 0, "Amount should be greater than zero!");
+
+    balance += msg.value;
+}
+
+
+This function is used to deposit Ether into our smart contract.
+
+Let's understand every line.
+
+Line 1:
+function deposit() public payable
+
+
+Keyword	Meaning
+function	Declares a function
+deposit()	Function name
+public	Can be called externally and internally
+payable	Allows the function to receive Ether
+
+What is payable?
+
+Normally, Solidity functions cannot receive Ether.
+
+If we want a function to accept Ether, we must declare it as payable.
+
+For example:
+function deposit() public payable
+
+
+This allows us to send Ether while calling the deposit function.
+
+Without payable, sending Ether to this function would result in an error.
+
+Line 2:
+require(accOwner == msg.sender, "You are not an account owner");
+
+
+What is require()?
+
+require() is used to check a condition.
+
+If the condition is false, the transaction is reverted.
+
+Here, we are checking:
+accOwner == msg.sender
+
+
+It means:
+
+Is the person calling the deposit function the actual account owner?
+
+Example:
+Account	Address	Result
+Owner	0xABC	Allowed
+Other user	0xXYZ	Rejected
+
+If someone other than the owner tries to deposit, the transaction fails with:
+You are not an account owner
+
+
+Why do we use it?
+
+To restrict deposit operations to the account owner.
+
+Line 3:
+require(msg.value > 0, "Amount should be greater than zero!");
+
+
+What is msg.value?
+
+msg.value represents the amount of Ether sent along with the current transaction.
+
+For example:
+
+Suppose we call the deposit function and enter:
+1 ETH
+
+
+Then:
+msg.value = 1 ETH
+
+
+Now the condition checks:
+msg.value > 0
+
+
+This means the deposited amount must be greater than zero.
+
+Examples:
+Deposit amount	Result
+0 ETH	Rejected
+0.5 ETH	Accepted
+1 ETH	Accepted
+5 ETH	Accepted
+
+Why do we use it?
+
+To prevent zero-value deposits.
+
+Line 4:
+balance += msg.value;
+
+
+This is where the actual balance calculation happens.
+
+The += operator means addition and assignment.
+
+It is equivalent to:
+balance = balance + msg.value;
+
+
+Example:
+
+Initially:
+balance = 0 ETH
+
+
+We deposit 2 ETH.
+balance = 0 + 2
+balance = 2 ETH
+
+
+We deposit another 3 ETH.
+balance = 2 + 3
+balance = 5 ETH
+
+
+Therefore, the balance keeps increasing whenever we deposit Ether.
+
+Block 7: Withdraw Function
+function withdraw() public payable {
+
+    require(accOwner == msg.sender, "You are not an account owner");
+    require(msg.value > 0, "Withdrawal money should be greater than zero");
+
+    balance -= msg.value;
+}
+
+
+This function is intended to withdraw money from the bank.
+
+Let's understand it line by line.
+
+Line 1:
+function withdraw() public payable
+
+
+- function: Declares a function.
+- withdraw(): Name of the function.
+- public: Allows it to be called externally.
+- payable: Allows Ether to be sent along with the function call.
+Notice something important:
+
+We have used payable here because the code expects an Ether value through msg.value.
+
+Line 2:
+require(accOwner == msg.sender, "You are not an account owner");
+
+
+This checks whether the person calling the withdrawal function is the account owner.
+
+If someone else tries to withdraw, the transaction is rejected.
+
+Why?
+
+We don't want unauthorized users to withdraw money from the account.
+
+Line 3:
+require(msg.value > 0, "Withdrawal money should be greater than zero");
+
+
+This checks whether the withdrawal amount is greater than zero.
+
+For example:
+- 0 ETH → Rejected.
+- 0.5 ETH → Accepted.
+- 1 ETH → Accepted.
+Line 4:
+balance -= msg.value;
+
+
+The -= operator means subtraction and assignment.
+
+It is equivalent to:
+balance = balance - msg.value;
+
+
+Example:
+
+Suppose:
+balance = 5 ETH
+
+
+We withdraw 2 ETH.
+balance = 5 - 2
+balance = 3 ETH
+
+
+But there is an important problem in this code!
+
+We have not checked whether the withdrawal amount is less than or equal to the available balance.
+
+For example:
+balance = 2 ETH
+withdrawal amount = 5 ETH
+
+
+The subtraction will fail because Solidity 0.8 and above automatically checks for integer underflow.
+
+Also, our function does not actually transfer Ether to the owner's wallet. It only decreases the internal balance.
+
+We'll fix these issues in the improved version below.
+
+Block 8: Show Balance Function
+function showBalance() public view returns(uint256) {
+
+    require(accOwner == msg.sender, "You are not an account owner");
+
+    return balance;
+}
+
+
+This function is used to display the account balance.
+
+Line 1:
+function showBalance() public view returns(uint256)
+
+
+Let's understand each keyword.
+Keyword	Meaning
+function	Declares a function
+showBalance()	Function name
+public	Can be called externally
+view	Reads data without modifying state
+returns(uint256)	Returns an unsigned integer
+
+What is view?
+
+view means that the function can read the contract's state variables but cannot modify them.
+
+For example:
+return balance;
+
+
+We are only reading the balance.
+
+We are not increasing or decreasing it.
+
+What does returns(uint256) mean?
+
+It tells Solidity that this function will return an unsigned integer.
+
+Since our balance variable is uint256, we return the same data type.
+
+Line 2:
+require(accOwner == msg.sender, "You are not an account owner");
+
+
+Again, we check whether the person requesting the balance is the account owner.
+
+Other users cannot check the balance through this function.
+
+Line 3:
+return balance;
+
+
+This returns the current value of the balance.
+
+Example:
+balance = 5 ETH
+
+
+When we call showBalance(), it returns the balance in Wei.
+
+Remix may display a large number because Solidity internally stores Ether in Wei.
+
+4. Complete execution example
+Let's assume we deploy the contract using Account 1.
+Initial deployment
+Account owner
+
+Account 1
+
+Initial balance
+
+0 ETH
+
+
+Transaction 1: Deposit 2 ETH
+Previous balance
+
+0 ETH
+
+Deposited
+
++2 ETH
+
+New balance
+2 ETH
+
+
+Transaction 2: Deposit 3 ETH
+Previous balance
+
+2 ETH
+
+Deposited
+
++3 ETH
+
+New balance
+5 ETH
+
+
+Transaction 3: Withdraw 1 ETH
+Previous balance
+
+5 ETH
+
+Withdrawn (accounting only)**
+
+-1 ETH
+
+New balance
+4 ETH
+
+
+Transaction 4: Show Balance
+4 ETH
+Conceptual balance. Actual function output is 4000000000000000000 Wei.
+
+5. How to execute this in Remix IDE
+
+
+
+
+
+
+
+ludu.co
+
+
+Follow these steps:
+1. Open Remix IDE.
+2. Create a new file named Bank.sol.
+3. Paste your Solidity code.
+4. Open the Solidity Compiler tab.
+5. Select a compatible compiler version (0.8.x).
+6. Click Compile Bank.sol.
+7. Open the Deploy & Run Transactions tab.
+8. Select the Remix VM environment.
+9. Select Account 1.
+10. Click Deploy.
+After deployment, you will see the contract under Deployed Contracts.
+
+To test the functions:
+Function	What to do
+accOwner	Click to see the owner address
+deposit	Enter an amount in the Value field, select Ether, and click deposit
+withdraw	Enter an amount in the Value field, select Ether, and click withdraw
+showBalance	Click to see the stored balance
+
+Important: In your current code, the withdrawal Value field is also sending Ether into the contract. It is not sending Ether back to you.
+6. Important concepts used in this program
+Concept	Why we used it
+contract	To create our Bank smart contract
+uint256	To store the balance
+address	To store the owner's wallet address
+public	To allow external access
+constructor	To assign the owner during deployment
+msg.sender	To identify the caller
+msg.value	To get the Ether sent with a transaction
+payable	To allow a function to receive Ether
+require()	To validate conditions
++=	To increase the balance
+-=	To decrease the balance
+view	To read data without modifying it
+returns	To return the balance
+
+7. Important corrections to make this a proper Bank contract
+Your current code demonstrates the basic logic, but there are three important issues:
+1. The withdrawal function should transfer Ether to the owner instead of asking the owner to send more Ether.
+2. We should check whether sufficient balance is available before withdrawal.
+3. The contract's actual Ether balance and the internal balance variable should remain consistent.
+A better withdrawal function would look like this:
+function withdraw(uint256 amount) public {
+
+    require(accOwner == msg.sender, "You are not the owner");
+    require(amount > 0, "Amount should be greater than zero");
+    require(amount <= balance, "Insufficient balance");
+
+    balance -= amount;
+
+    (bool success, ) = payable(accOwner).call{value: amount}("");
+
+    require(success, "Transfer failed");
+}
+
+
+Here, amount is the withdrawal amount in Wei.
+
+This function:
+- Checks ownership.
+- Checks that the amount is greater than zero.
+- Checks sufficient balance.
+- Decreases the internal balance.
+- Transfers Ether to the owner.
+- Reverts the transaction if the transfer fails (including restoring the previous balance change).
+For a production banking contract, additional security considerations and testing are necessary.
+
+8. Example: Where is this concept used in real life?
+Imagine an online banking application.
+
+When you deposit ₹5,000:
+- The bank receives your money.
+- Your account balance increases by ₹5,000.
+When you withdraw ₹2,000:
+- The bank verifies your identity.
+- It checks whether you have sufficient funds.
+- It transfers ₹2,000 to you.
+- Your balance decreases by ₹2,000.
+Our Solidity contract follows the same basic banking logic, except it uses Ether and blockchain transactions.
+
+The main purpose of this practical is to understand how smart contracts can manage funds, maintain balances, verify ownership, and execute transactions automatically without depending on a traditional bank's central database.
+
+
+application :
+ractical: Bank Account Smart Contract on a Test Network
+1. Aim of the practical
+To write and deploy a Bank Smart Contract on an Ethereum test network using Solidity that performs the following operations:
+1. Deposit money.
+2. Withdraw money.
+3. Show account balance.
+2. What is this practical about?
+In this practical, we are creating a simple banking system using Blockchain Technology and Smart Contracts.
+
+Normally, when we use a traditional banking application, the bank maintains our account details and balance in its database.
+
+But in this practical, we use a smart contract to manage the customer's account on a blockchain.
+
+A smart contract is a program stored on a blockchain that automatically executes when certain conditions are satisfied.
+
+Our Bank smart contract performs three main operations:
+- Deposit: Allows the account owner to deposit Ether into the smart contract.
+- Withdraw: Allows the account owner to withdraw Ether from the smart contract.
+- Show Balance: Displays the current account balance.
+We also use ownership verification so that only the customer who deployed the contract can perform these operations.
+How does it work?
+
+
+
+
+
+
+
+learnxinyminutes.com
+
+
+1. The customer deploys the Bank smart contract.
+2. The customer's wallet address is stored as the account owner.
+3. The customer deposits Ether into the contract.
+4. The smart contract updates the balance.
+5. The customer can withdraw Ether.
+6. The customer can check the updated balance.
+3. Applications of this practical
+This concept can be used in several real-world applications:
+
+1. Decentralized Banking
+
+Smart contracts can manage financial transactions without requiring a traditional central banking database.
+
+2. Digital Wallets
+
+Users can deposit, store and withdraw digital currencies such as Ether.
+
+3. Payment Systems
+
+Smart contracts can automatically process payments between users when predefined conditions are satisfied.
+
+4. Decentralized Finance (DeFi)
+
+Smart contracts are used in decentralized financial applications for lending, borrowing, staking and other financial operations.
+
+5. Automated Fund Management
+
+Organizations can use smart contracts to manage funds according to predefined rules.
+
+6. Transparent Transactions
+
+Blockchain records transactions transparently, making them easier to verify and audit.
+4. Technologies used
+Technology	Purpose
+Solidity	Programming language for writing smart contracts
+Remix IDE	Writing, compiling and deploying contracts
+Ethereum	Blockchain platform
+Ethereum Test Network	Testing smart contracts without using real Ether
+MetaMask	Wallet used to interact with the contract
+
+5. Why do we use a test network?
+A test network is a blockchain environment used to test smart contracts without spending real money.
+
+For example, when deploying our Bank contract, we can use test Ether instead of actual Ether.
+
+Advantages:
+- No real money is required.
+- We can test deposit and withdrawal operations.
+- We can identify errors before deploying on the main blockchain.
+- We can understand how blockchain transactions work.
+6. Important concepts learned
+Concept	What we learn
+Smart Contract	A program deployed on a blockchain
+Solidity	Language used to develop smart contracts
+Blockchain	Distributed and decentralized ledger
+Constructor	Executes automatically during deployment
+msg.sender	Identifies the calling wallet address
+msg.value	Represents Ether sent with a transaction
+Payable	Allows a function to receive Ether
+Require	Checks conditions before executing operations
+View	Reads information without modifying state
+Test Network	Allows testing without real cryptocurrency
+
+7. What should you say if the examiner asks, "Explain this practical"?
+You can explain it like this:
+
+"This practical demonstrates the implementation of a simple banking system using blockchain technology. We have developed a Bank smart contract using Solidity and deployed it on an Ethereum test network through Remix IDE.
+
+The contract provides three operations: deposit, withdraw and show balance. We use the constructor to store the wallet address of the person deploying the contract as the account owner. We use msg.sender to verify the owner and require statements to validate transactions.
+
+The payable keyword allows the contract to receive Ether, while the view keyword allows us to read the account balance without modifying it.
+
+The main objective is to understand how smart contracts manage financial transactions securely and automatically on a blockchain."
+
+Important for viva
+Remember these three things:
+- deposit() → Adds Ether to the account balance.
+- withdraw() → Deducts Ether from the account balance and, in a properly implemented version, transfers it to the owner.
+- showBalance() → Displays the current account balance.
+One important distinction: Your original code's withdrawal function only decreases the internal balance; it does not actually transfer Ether back to the customer. Also, your original withdraw() accepts Ether because it is marked payable. For a correct working bank contract, use the improved withdrawal function from the previous explanation.
+1. Applications of Bank Smart Contract
+A Bank Smart Contract can be used in the following real-world applications:
+
+1. Digital Banking
+- Users can deposit and withdraw digital money.
+- Account balances can be maintained using smart contracts.
+- Transactions can be executed automatically.
+2. Cryptocurrency Wallets
+- Users can store cryptocurrencies such as Ether.
+- They can send and receive cryptocurrency.
+- Smart contracts can manage wallet transactions.
+3. Decentralized Finance (DeFi)
+- Used in decentralized lending and borrowing platforms.
+- Users can lend their cryptocurrency and earn interest.
+- Financial operations can happen through smart contracts.
+4. Automated Payments
+- Payments can be automatically transferred when predefined conditions are satisfied.
+- Useful for online transactions and payment systems.
+5. Secure Fund Management
+- Only authorized users can perform specific operations.
+- Smart contracts can restrict access using wallet addresses.
+6. Transparent Transactions
+- Transactions recorded on a blockchain can be verified.
+- This helps maintain transparency and traceability.
+2. What is Remix IDE?
+
+
+
+
+
+
+
+rareskills.io
+
+
+Remix IDE is a free, browser-based development environment used to write, compile, deploy and test smart contracts.
+
+Website: https://remix.ethereum.org/
+
+Think of Remix as similar to VS Code, but specifically designed for Solidity and smart contract development.
+
+Why do we use Remix?
+1. To write Solidity code.
+2. To compile smart contracts.
+3. To identify syntax and compilation errors.
+4. To deploy smart contracts.
+5. To execute functions such as deposit, withdraw and show balance.
+6. To test smart contracts on blockchain networks.
+Important sections in Remix:
+Section	Purpose
+File Explorer	Create and manage Solidity files
+Solidity Compiler	Compile smart contracts
+Deploy & Run Transactions	Deploy and execute contracts
+Terminal	View transaction details and execution results
+
+3. What is Solidity?
+
+
+
+
+
+
+
+
+
+Solidity is a programming language used to write smart contracts.
+
+For example:
+pragma solidity ^0.8.0;
+
+contract Bank {
+    uint256 balance = 0;
+}
+
+
+Here, we are writing the logic of our Bank smart contract using Solidity.
+
+Why do we use Solidity?
+
+Because Ethereum smart contracts are commonly written using Solidity.
+4. What is Blockchain?
+
+
+
+
+
+
+
+techinika.com
+
+
+Blockchain is a distributed digital ledger that stores information in blocks connected together.
+
+Each block contains transaction information and is linked to the previous block using cryptographic techniques.
+
+Why do we use blockchain?
+- Decentralization: No single central authority controls the entire network.
+- Transparency: Transactions can be verified.
+- Security: Cryptographic mechanisms help protect records.
+- Immutability: Confirmed records are difficult to alter.
+In our practical, blockchain stores the deployed smart contract and its state.
+5. What is Ethereum?
+
+
+
+
+
+
+
+
+
+Ethereum
+
+A blockchain platform that allows developers to create and deploy smart contracts and decentralized applications.
+
+
+Ethereum provides an environment where our Bank smart contract can execute.
+
+What is Ether (ETH)?
+
+Ether is the native cryptocurrency of the Ethereum blockchain.
+
+In our practical, we use Ether as the money deposited into the Bank contract.
+6. What is a Test Network?
+A test network (testnet) is a blockchain network used for testing smart contracts and applications without spending real cryptocurrency.
+
+For example, Ethereum has test networks such as:
+- Sepolia
+- Hoodi
+We can obtain test ETH from faucets and use it to test our contract.
+
+Why do we use a test network?
+
+Suppose we create a Bank contract and accidentally write incorrect withdrawal logic.
+
+If we deploy it on the real Ethereum network, transactions may involve actual money.
+
+Instead, we deploy it on a test network and experiment using test ETH.
+7. What is MetaMask?
+
+
+
+
+
+
+
+
+
+MetaMask
+
+A cryptocurrency wallet that allows users to connect to blockchain networks and interact with smart contracts.
+
+
+Why do we use MetaMask?
+- To create a blockchain wallet.
+- To manage Ethereum accounts.
+- To connect to test networks.
+- To receive test ETH.
+- To approve transactions and interact with smart contracts.
+For example, when you deploy your Bank contract, MetaMask can ask you to approve the deployment transaction.
+8. How are all these technologies connected in our practical?
+This is the overall workflow:
+Solidity
+
+Write Bank smart contract
+
+Remix IDE
+
+Write, compile and deploy contract
+
+MetaMask / Wallet
+
+Connect account and approve transactions
+
+Ethereum Test Network
+
+Deploy and execute the smart contract
+
+Bank Smart Contract
+
+Deposit • Withdraw • Show Balance
+
+
+9. Important viva questions
+Question	Answer
+What is Remix?	An online IDE for developing Solidity smart contracts.
+What is Solidity?	A programming language for writing smart contracts.
+What is Ethereum?	A blockchain platform supporting smart contracts.
+What is Ether?	The native cryptocurrency of Ethereum.
+What is a testnet?	A blockchain network used for testing.
+What is MetaMask?	A cryptocurrency wallet used to interact with blockchain applications.
+What is a smart contract?	A program deployed on a blockchain that executes predefined logic.
+What is gas?	The computational fee required to execute operations on Ethereum.
+What is deployment?	The process of publishing a smart contract on a blockchain.
+What is msg.sender?	The address of the account calling the current function.
+
+One important thing to remember for your practical exam:
+
+Remix is the software where we write and deploy the code. Solidity is the language in which we write the code. Ethereum is the blockchain platform, and the testnet is where we test our smart contract without using real ETH. MetaMask is the wallet used to connect and approve transactions.'''
